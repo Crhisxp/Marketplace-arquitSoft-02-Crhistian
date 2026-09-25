@@ -1,6 +1,6 @@
 # Marketplace de productos para mascotas
 ## nombre
-Integrante 1
+Crhistian Flores Marquina
 ## Descripción
 Marketplace académico de productos para mascotas.
 ## Caso de estudio
