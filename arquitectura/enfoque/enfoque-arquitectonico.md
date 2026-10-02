@@ -1,74 +1,67 @@
-# Estilo Arquitectónico
+# Enfoque Arquitectónico: Clean Architecture
 
-## Descripción
-Se selecciona el estilo **Monolito Modular con Arquitectura en Capas** para la estructura global del sistema[cite: 4, 8].
+## Resumen del Enfoque
 
-* **Monolito Modular:** Representa la unidad de despliegue principal en un solo proceso ejecutable[cite: 4, 9].
-* **Capas Lógicas:** Divide el sistema internamente en Presentación, Lógica de Negocio y Datos[cite: 9].
+| Elemento | Descripción aplicada al Marketplace |
+| :--- | :--- |
+| **Patrón / Enfoque arquitectónico** | Clean Architecture (Arquitectura Limpia). |
+| **Objetivo** | Separar responsabilidades y controlar las dependencias hacia el dominio. |
+| **¿Qué problema resuelve?** | Evita el acoplamiento entre la interfaz Angular, las reglas del negocio y las tecnologías externas (bases de datos, API y servicios de pago). |
+| **Capas definidas** | Presentación, Aplicación, Dominio e Infraestructura. |
+| **Beneficios** | • Facilita el mantenimiento y las pruebas unitarias.<br>• Permite cambiar implementaciones técnicas sin modificar las reglas de negocio.<br>• Mejora la organización y separación de responsabilidades del código. |
 
-## Diagrama del Estilo Arquitectónico
+## Diagrama de Clean Architecture (GoPet Marketplace)
 
 ```mermaid
 graph TD
-    subgraph Cliente
-        C[Cliente Web / Móvil]
-    end
-
-    subgraph Monolito Marketplace Backend
-        subgraph Middlewares Express
-            M[Auth JWT / Validaciones / Logger]
+    subgraph Adaptadores y Frameworks - Angular
+        subgraph Presentación
+            UI1[CatalogoComponent]
+            UI2[DetalleCarrito]
+            UI3[CarritoComponent]
+            UI4[AppComponent]
         end
 
-        subgraph Capa de Presentación
-            P1[Módulo Usuarios]
-            P2[Módulo Sellers]
-            P3[Módulo Catálogo]
-            P4[Módulo Carrito]
-            P5[Módulo Pedidos]
+        subgraph Aplicación - Casos de Uso
+            UC1[ConsultarCatalogoUseCase]
+            UC2[AgregarAlCarritoUseCase]
+            UC3[RegistrarCompraUseCase]
         end
 
-        subgraph Capa de Lógica de Negocio
-            L1[usuarios.service]
-            L2[sellers.service]
-            L3[catalogo.service]
-            L4[carrito.service]
-            L5[pedidos.service]
+        subgraph Dominio - Core / Reglas de Negocio
+            subgraph Modelos
+                E1[Producto]
+                E2[Carrito]
+                E3[Pedido]
+            end
+            subgraph Contratos / Puertos
+                R1[RepositorioProducto]
+                R2[RepositorioPedido]
+                R3[ProcesadorPagos]
+                R4[NotificadorCliente]
+            end
         end
 
-        subgraph Capa de Datos
-            D1[usuarios.repository]
-            D2[sellers.repository]
-            D3[catalogo.repository]
-            D4[carrito.repository]
-            D5[pedidos.repository]
+        subgraph Infraestructura
+            I1[RepositorioProductoMemoria]
+            I2[RepositorioPedidoMemoria]
+            I3[ProcesadorPagosSimulado]
+            I4[NotificadorConsole]
         end
     end
 
     subgraph Sistemas Externos
-        EXT1[Pasarela de Pagos]
-        EXT2[Servicio de Envíos]
+        API[Marketplace API REST]
     end
 
-    subgraph Base de Datos
-        DB[(PostgreSQL)]
-    end
+    UI1 & UI2 & UI3 --> UC1 & UC2 & UC3
+    UC1 & UC2 & UC3 --> E1 & E2 & E3
+    UC1 & UC2 & UC3 --> R1 & R2 & R3 & R4
 
-    C -->|HTTPS / REST| M
-    M --> P1 & P2 & P3 & P4 & P5
-    P1 --> L1
-    P2 --> L2
-    P3 --> L3
-    P4 --> L4
-    P5 --> L5
+    I1 -.->|Implementa| R1
+    I2 -.->|Implementa| R2
+    I3 -.->|Implementa| R3
+    I4 -.->|Implementa| R4
 
-    L1 --> D1
-    L2 --> D2
-    L3 --> D3
-    L4 --> D4
-    L5 --> D5
-
-    L5 -->|HTTPS / REST| EXT1
-    L5 -->|HTTPS / REST| EXT2
-
-    D1 & D2 & D3 & D4 & D5 -->|SQL| DB
+    I1 & I2 & I3 & I4 -->|HTTP / REST| API
 ```
